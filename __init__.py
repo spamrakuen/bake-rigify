@@ -5,7 +5,7 @@ bl_info = {
     'name': 'Bake Rigify rig',
     'author': 'Felix Schlitter',
     'version': (0, 0, 0),
-    'blender': (2, 8, 1),
+    'blender': (2, 80, 0),
     'category': 'Import-Export'
 }
 
@@ -22,7 +22,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
     bl_idname = 'object.bake_rigify'
     bl_options = {'REGISTER'}
 
-    action_selection = bpy.props.EnumProperty(
+    action_selection : bpy.props.EnumProperty(
         items=[ ('all', 'All actions', '', '', 0)
               , ('active', 'Active action', '', '', 1)
               , ('selected', 'Selected actions', '', '', 2)
@@ -31,21 +31,21 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         default='all'
     )
 
-    actions = bpy.props.BoolVectorProperty(
+    actions : bpy.props.BoolVectorProperty(
         name='Selected actions',
         size=32,
     )
 
-    delimiter = bpy.props.StringProperty(
+    delimiter : bpy.props.StringProperty(
         name='Delimiter',
         default='|'
     )
 
-    action_names = bpy.props.StringProperty(
+    action_names : bpy.props.StringProperty(
         name='Action names'
     )
 
-    suffix = bpy.props.StringProperty(
+    suffix : bpy.props.StringProperty(
         name='Suffix',
         description='String appended to baked action names',
         default='.baked'
@@ -63,7 +63,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         if not len(bpy.data.actions):
             col = layout.column()
-            col.label('No actions available', 'ERROR')
+            col.label('No actions available (please, create an animation first)', 'ERROR')
             return
 
         row = layout.row()
@@ -158,6 +158,11 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         # Turn all layers visible for operators to work
         bakeArma.data.layers = [True for _ in range(0, 32)]
 
+        # used to show progress
+        wm = bpy.context.window_manager        
+        wm.progress_begin(0, 6)
+        wm.progress_update(1)
+
         # Collect all edit bones
         ebs = bakeArma.data.edit_bones
         defBoneNames = [b.name for b in ebs if b.name.startswith('DEF')]
@@ -187,6 +192,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             c.target = bakeArma
             c.subtarget = defBoneName
 
+        # show progress
+        wm.progress_update(2)
+
         # Select target bones for baking
         bpy.ops.object.mode_set(mode='EDIT')
         ebs = bakeArma.data.edit_bones
@@ -197,6 +205,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.mode_set(mode='POSE')
         bpy.ops.object.mode_set(mode='OBJECT')
+
+        # show progress
+        wm.progress_update(3)
 
         # Perform the bake
         # Need to switch the area type (See: http://blenderartists.org/forum/archive/index.php/t-195704.html)
@@ -216,6 +227,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         )
         if not bpy.app.background:
             ctx.area.type = current_type
+
+        # show progress
+        wm.progress_update(4)
 
         # Set Name for Baked Action
         bakeArma.animation_data.action.name = action.name + self.suffix
@@ -258,6 +272,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         oldRoot = bakeArma.data.edit_bones['dummy']
         oldRoot.parent = bakeArma.data.edit_bones['root']
 
+        # show progress
+        wm.progress_update(5)        
+
         # Remove all animation from root and dummy
         bpy.ops.object.mode_set(mode='POSE')
         for b in ['root', 'dummy']:
@@ -273,6 +290,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             bpy.ops.pose.scale_clear()
             bpy.ops.pose.rot_clear()
 
+        # show progress
+        wm.progress_update(6)            
+        
         # Now re-parent all bones to the dummy and then it's done
         bpy.ops.object.mode_set(mode='EDIT')
         dummyEB = bakeArma.data.edit_bones['dummy']
@@ -290,6 +310,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             bakeArma.name = origArma.name + self.suffix
 
         ctx.view_layer.objects.active = origArma
+
+        # show progress
+        wm.progress_end()
 
         return {'FINISHED'}
 
@@ -312,7 +335,7 @@ class OBJECT_PT_bake_rigify(bpy.types.Panel):
         if not len(bpy.data.actions):
             valid = False
             col = layout.column()
-            col.label('No actions available', icon='ERROR')
+            col.label(text='No actions available (please, create an animation first)', icon='ERROR')
 
         row = layout.row()
         row.enabled = valid
