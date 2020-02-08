@@ -3,6 +3,10 @@ Bake Rigify
 
 > Strips rigify-styled rigs down to their deformation bones and bakes their animations.
 
+## Updated for Blender 2.8
+
+* This fork has been updated for Blender 2.8
+
 ## How it works
 
 In essence, the operator

@@ -5,7 +5,7 @@ bl_info = {
     'name': 'Bake Rigify rig',
     'author': 'Felix Schlitter',
     'version': (0, 0, 0),
-    'blender': (2, 7, 2),
+    'blender': (2, 8, 1),
     'category': 'Import-Export'
 }
 
@@ -140,7 +140,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         origArma = arma
         origArmaName = origArma.name
         current_type = ''
-        ctx.scene.objects.active = origArma
+        ctx.view_layer.objects.active = origArma        
         origArma.select = True
 
         # Bake Armature
@@ -248,7 +248,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         # Add static root bone
         # Info: The static root bone is the original root bone's parent that does not move.
         # This avoids ``Delta Translation`` issues
-        ctx.scene.cursor_location = (0, 0, 0)
+        ctx.scene.cursor.location = (0, 0, 0)
         bpy.ops.object.mode_set(mode='EDIT')
         oldRoot = bakeArma.data.edit_bones['root']
         oldRoot.name = 'dummy'
@@ -289,7 +289,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         else:
             bakeArma.name = origArma.name + self.suffix
 
-        ctx.scene.objects.active = origArma
+        ctx.view_layer.objects.active = origArma
 
         return {'FINISHED'}
 
