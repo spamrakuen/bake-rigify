@@ -328,3 +328,5 @@ def unregister():
     bpy.utils.unregister_class(OBJECT_PT_bake_rigify)
     bpy.utils.unregister_class(OBJECT_OT_bake_rigify)
 
+if __name__ == '__main__':
+    register() 
