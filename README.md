@@ -21,7 +21,7 @@ In essence, the operator
 
 ## Installation
 
-* Download the [Latest Release archive zip](https://github.com/felixSchl/bake-rigify/releases)
+* Download the [archive zip](https://github.com/spamrakuen/bake-rigify/archive/master.zip)
 * In Blender's add-on manager (File-->User Preferences-->Addons), using
   `Install from File`, install the zip downloaded.
 * Now enable the `Bake Rigify` addon.
