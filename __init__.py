@@ -304,7 +304,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         bpy.ops.object.select_all(action='DESELECT')
         if not keep:
             bakeArma.select = True
-            ctx.scene.objects.active = bakeArma
+            ctx.view_layer.objects.active = bakeArma
             bpy.ops.object.delete()
         else:
             bakeArma.name = origArma.name + self.suffix
